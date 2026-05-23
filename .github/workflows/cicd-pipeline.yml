@@ -79,7 +79,6 @@ jobs:
           docker build -t ${{ env.DOCKER_IMAGE_NAME }}:latest \
                        -t ${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }} \
                        .
-        displayName: 'Build Docker Image'
       
       - name: List Docker Images
         run: |
