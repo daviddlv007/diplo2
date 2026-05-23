@@ -31,23 +31,10 @@ jobs:
         run: dotnet restore
       
       - name: Build application
-        run: dotnet build MiApi.csproj --configuration Release --no-restore
-      
-      - name: Build and Run Unit Tests
         run: |
-          echo "=== Building and Running MiApi.Tests Project ==="
-          dotnet test tests/MiApi.Tests/MiApi.Tests.csproj \
-            --configuration Release \
-            --logger "trx" \
-            --results-directory ./test-results
-        continue-on-error: true
-      
-      - name: Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: ./test-results/
+          echo "=== CI Stage: Building Application ==="
+          dotnet build MiApi.csproj --configuration Release --no-restore
+          echo "✓ Application built successfully"
 
   testing:
     name: Testing Stage
@@ -68,30 +55,25 @@ jobs:
       
       - name: Run Unit Tests (MiApi.Tests)
         run: |
-          echo "=== Executing Unit Tests ==="
+          echo "=== Testing Stage: Running Unit Tests ==="
           dotnet test tests/MiApi.Tests/MiApi.Tests.csproj \
             --configuration Release \
             --logger "console;verbosity=detailed" \
-            --logger "trx;LogFileName=test-results.trx" \
+            --logger "trx;LogFileName=unit-tests.trx" \
             --results-directory ./test-results \
             --collect:"XPlat Code Coverage"
+          echo "✓ Unit tests completed"
       
-      - name: Display Test Results
+      - name: Display Unit Test Results
         if: always()
         run: |
-          echo "=== Test Execution Summary ==="
-          if [ -f ./test-results/test-results.trx ]; then
-            echo "✓ Test results file generated successfully"
+          echo "=== Unit Test Results ==="
+          if [ -f ./test-results/unit-tests.trx ]; then
+            echo "✓ Test results file generated"
             ls -lh ./test-results/
           else
-            echo "No test results found"
+            echo "⚠ No unit test results found"
           fi
-      
-      - name: Run Integration Tests
-        run: |
-          echo "Running integration tests..."
-          dotnet test --configuration Release --logger "console;verbosity=detailed"
-        continue-on-error: true
       
       - name: Upload Test Artifacts
         if: always()
